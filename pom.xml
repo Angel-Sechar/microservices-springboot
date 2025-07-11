@@ -19,6 +19,7 @@
 	<!-- ========================================= -->
 	<modules>
 		<module>common</module>
+		<module>api-gateway</module>
 	</modules>
 
 	<properties>
@@ -209,7 +210,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
+<!--INHERITANCE FOR THE POM CHILDREN-->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -256,6 +257,8 @@
 				<artifactId>commons-collections4</artifactId>
 				<version>4.4</version>
 			</dependency>
+
+
 		</dependencies>
 
 	</dependencyManagement>
@@ -287,5 +290,22 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<!--SHARING PLUGIN TO THE CHILDREN POM-->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<configuration>
+						<excludes>
+							<exclude>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+							</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
