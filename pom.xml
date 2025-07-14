@@ -20,6 +20,7 @@
 	<modules>
 		<module>common</module>
 		<module>api-gateway</module>
+		<module>auth-service</module>
 	</modules>
 
 	<properties>
@@ -148,6 +149,11 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
+		<!-- Spring Cloud Commons - foundational classes -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-commons</artifactId>
+		</dependency>
 
 		<!-- ========================================= -->
 		<!-- RESILIENCE & PATTERNS                   -->
@@ -210,7 +216,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-<!--INHERITANCE FOR THE POM CHILDREN-->
+<!--INHERITANCE FOR THE POM CHILDREN - OPTIONALLY-->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -257,7 +263,6 @@
 				<artifactId>commons-collections4</artifactId>
 				<version>4.4</version>
 			</dependency>
-
 
 		</dependencies>
 
