@@ -105,7 +105,7 @@ public class User extends AggregateRoot<UserId> {
     }
 
     /**
-     * Change user password
+     * ChangePasswordCommand user password
      */
     public void changePassword(Password newPassword) {
         if (!canLogin()) {
