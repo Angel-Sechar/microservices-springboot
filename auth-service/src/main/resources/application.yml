@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: auth-service
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/campus_auth
+    username: campus_user
+    password: campus_password
+    driver-class-name: org.postgresql.Driver
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect  # LATEST
+        format_sql: true
+      type_contributors: org.hibernate.type.json.JsonBinaryType
+    database-platform: org.hibernate.dialect.SQLServerDialect
+  # Liquibase Configuration
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  # Security Configuration
+  security:
+    user:
+      name: admin
+      password: admin123
+
+# Server Configuration
+server:
+  port: 8081
+  servlet:
+    context-path: /
+
+# Custom Auth Configuration
+auth:
+  jwt:
+    secret: campus-ecommerce-super-secret-key-minimum-256-bits-for-hs256-algorithm-security
+    access-token-expiration: PT24H    # 24 hours
+    refresh-token-expiration: P30D    # 30 days
+    issuer: campus-ecommerce
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Logging Configuration
+logging:
+  level:
+    com.ecommerce.campus.auth: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

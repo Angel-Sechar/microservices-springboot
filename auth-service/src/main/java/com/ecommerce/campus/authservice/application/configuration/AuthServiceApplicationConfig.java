@@ -1,4 +1,4 @@
-package com.ecommerce.campus.authservice.application.config;
+package com.ecommerce.campus.authservice.application.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ComponentScan;

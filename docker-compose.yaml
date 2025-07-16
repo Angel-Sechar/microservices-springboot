@@ -1,9 +1,67 @@
+version: '3.8'
+
 services:
+  # MS SQL Server 2022 Database
   sqlserver:
-    image: 'mcr.microsoft.com/mssql/server:latest'
+    image: 'mcr.microsoft.com/mssql/server:2022-latest'
+    container_name: campus-sqlserver
     environment:
-      - 'ACCEPT_EULA=yes'
-      - 'MSSQL_PID=express'
-      - 'MSSQL_SA_PASSWORD=verYs3cret'
+      - 'ACCEPT_EULA=Y'
+      - 'MSSQL_PID=Express'
+      - 'MSSQL_SA_PASSWORD=verYs3cret!'
+      - 'MSSQL_USER=campus_user'
+      - 'MSSQL_PASSWORD=campus_password'
+      - 'MSSQL_DATABASE=campus_auth'
     ports:
-      - '1433'
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+  # Redis for caching (future use)
+  redis:
+    image: redis:7-alpine
+    container_name: campus-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: campus-auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=campus_auth;encrypt=true;trustServerCertificate=true
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: verYs3cret!
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.SQLServerDialect
+      # OPTIONAL FOR DEBUGGING
+      SPRING_JPA_SHOW_SQL: false
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+    ports:
+      - "8081:8081"
+    depends_on:
+      - sqlserver
+    networks:
+      - campus-network
+    volumes:
+      - auth_logs:/var/log/auth-service
+    restart: unless-stopped
+
+volumes:
+  sqlserver_data:
+  auth_logs:
+
+networks:
+  campus-network:
+    driver: bridge
