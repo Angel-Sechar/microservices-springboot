@@ -26,4 +26,6 @@ public class AuthenticationResponse {
     private String[] authorities;   // User roles/permissions
     private boolean requiresPasswordChange;
     private boolean isFirstLogin;
+
+
 }

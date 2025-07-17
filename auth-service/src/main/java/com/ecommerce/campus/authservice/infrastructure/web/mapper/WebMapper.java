@@ -70,13 +70,13 @@ public interface WebMapper {
     /**
      * Map UpdateProfileRequest to UpdateUserProfileCommand
      */
-    default UpdateUserProfileCommand toUpdateUserProfileCommand(String userId, UpdateProfileRequest request) {
-        return UpdateUserProfileCommand.builder()
-                .userId(userId)
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .build();
-    }
+//    default UpdateUserProfileCommand toUpdateUserProfileCommand(String userId, UpdateProfileRequest request) {
+//        return UpdateUserProfileCommand.builder()
+//                .userId(userId)
+//                .firstName(request.getFirstName())
+//                .lastName(request.getLastName())
+//                .build();
+//    }
 
     /**
      * Create GetUserProfileCommand from userId

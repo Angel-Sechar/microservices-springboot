@@ -23,4 +23,5 @@ public class LoginCommand {
     private String ipAddress;     // For security tracking
     private String userAgent;    // For security tracking
     private boolean rememberMe;  // For extended token expiration
+    private String deviceInfo;
 }
