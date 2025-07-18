@@ -11,7 +11,7 @@ import org.mapstruct.Named;
  * MapStruct mapper for JPA Entity ↔ Domain conversion
  */
 @Mapper(componentModel = "spring")
-public interface UserPersistenceMapper {
+public interface    UserPersistenceMapper {
 
     /**
      * Convert JPA entity to domain object
