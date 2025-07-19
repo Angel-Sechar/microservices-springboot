@@ -1,72 +1,77 @@
 spring:
   application:
     name: auth-service
+  config:
+    import: file:.env.local
+
+server:
+  port: ${PORT}
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=auth_db;encrypt=false;trustServerCertificate=true
-    username: ${DB_USERNAME:sa}
-    password: ${DB_PASSWORD:postgres}
+    url: jdbc:sqlserver://${DB_HOST}:${DB_PORT};databaseName=${DB_NAME};encrypt=${DB_ENCRYPT};trustServerCertificate=${DB_TRUST_CERT}
+    username: ${DB_USERNAME}  # No default - MUST be provided
+    password: ${DB_PASSWORD}  # No default - MUST be provided
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 20000
+      maximum-pool-size: ${DB_POOL_SIZE}
+      minimum-idle: ${DB_MIN_IDLE}
+      connection-timeout: ${DB_TIMEOUT}
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: ${JPA_DDL_AUTO}
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
-        format_sql: false
+        format_sql: ${JPA_FORMAT_SQL}
         jdbc:
-          batch_size: 25
+          batch_size: ${JPA_BATCH_SIZE}
         order_inserts: true
-    show-sql: false
+    show-sql: ${JPA_SHOW_SQL}
 
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: ${LIQUIBASE_ENABLED}
 
   redis:
-    host: ${REDIS_HOST:localhost}
-    port: ${REDIS_PORT:6379}
-    timeout: 1000ms
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD:}
+    timeout: ${REDIS_TIMEOUT}
     lettuce:
       pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 0
+        max-active: ${REDIS_POOL_MAX}
+        max-idle: ${REDIS_POOL_IDLE}
+        min-idle: ${REDIS_POOL_MIN}
 
   cloud:
     consul:
-      host: ${CONSUL_HOST:localhost}
-      port: ${CONSUL_PORT:8500}
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
       discovery:
-        enabled: true
+        enabled: ${CONSUL_ENABLED}
         service-name: ${spring.application.name}
-        health-check-interval: 10s
-        health-check-path: /actuator/health
-
-server:
-  port: ${PORT:8081}
+        health-check-interval: ${CONSUL_HEALTH_INTERVAL}
+        health-check-path: ${CONSUL_CHECK_PATH}
 
 jwt:
-  secret: ${JWT_SECRET:mySecretKey123!@#mustBe256BitsLongForHS256}
-  access-token-expiration: 900000 # 15 minutes
-  refresh-token-expiration: 604800000 # 7 days
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: ${ACTUATOR_ENDPOINTS}
   endpoint:
     health:
-      show-details: always
+      show-details: ${ACTUATOR_SHOW_DETAILS}
 
 logging:
   level:
-    com.ecommerce.campus.auth-service: DEBUG
-    org.springframework.security: DEBUG
+    com.ecommerce.campus.auth-service: ${LOG_LEVEL_APP}
+    org.springframework.security: ${LOG_LEVEL_SECURITY}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL}
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
