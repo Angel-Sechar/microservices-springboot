@@ -1,273 +1,72 @@
-# application.yml - Updated with OpenFeign configuration
 spring:
   application:
     name: auth-service
-  
+
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=campus_auth;encrypt=false;trustServerCertificate=true
-    username: sa
-    password: verYs3cret
+    url: jdbc:sqlserver://localhost:1433;databaseName=auth_db;encrypt=false;trustServerCertificate=true
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-  
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20000
+
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
-        format_sql: true
-  
+        format_sql: false
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+    show-sql: false
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    timeout: 1000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
   cloud:
     consul:
-      host: localhost
-      port: 8500
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
       discovery:
+        enabled: true
         service-name: ${spring.application.name}
         health-check-interval: 10s
-        prefer-ip-address: true
-        register: true
         health-check-path: /actuator/health
-        health-check-timeout: 30s
-        instance-id: ${spring.application.name}:${server.port}
-    
-    # ========================================= 
-    # OPENFEIGN CONFIGURATION
-    # =========================================
-    openfeign:
-      client:
-        config:
-          default:                          # Default configuration for all Feign clients
-            connectTimeout: 5000            # 5 seconds
-            readTimeout: 10000              # 10 seconds
-            loggerLevel: basic
-            retryer: com.ecommerce.campus.authservice.infrastructure.external.config.DefaultRetryer
-
-          notification-service:            # Specific config for notification service
-            connectTimeout: 3000            # Faster for internal services
-            readTimeout: 8000
-            loggerLevel: full               # More detailed logging
-
-          user-profile-service:            # Specific config for profile service  
-            connectTimeout: 3000
-            readTimeout: 8000
-            loggerLevel: full
-
-          google-auth:                      # External service - more conservative
-            connectTimeout: 2000            # Faster timeout for external
-            readTimeout: 5000
-            loggerLevel: basic
-
-          facebook-auth:                    # External service
-            connectTimeout: 2000
-            readTimeout: 5000
-            loggerLevel: basic
-      
-      # Enable service discovery for Feign clients
-      discovery:
-        enabled: true
-      
-      # Circuit breaker integration
-      circuitbreaker:
-        enabled: true
-        alphanumeric-ids:
-          enabled: true
-    
-    # =========================================
-    # LOAD BALANCER CONFIGURATION  
-    # =========================================
-    loadbalancer:
-      ribbon:
-        enabled: false                      # Use Spring Cloud LoadBalancer instead
-      cache:
-        enabled: true
-        ttl: 35s                           # Cache service instances
-
-  # =========================================
-  # SECURITY CONFIGURATION
-  # =========================================
-  security:
-    jwt:
-      secret: mySecretKey123456789012345678901234567890123456789012345678901234567890
-      access-token-expiration: 3600000      # 1 hour
-      refresh-token-expiration: 604800000   # 7 days
 
 server:
-  port: 8081
+  port: ${PORT:8081}
 
-# =========================================
-# RESILIENCE4J CONFIGURATION (Circuit Breakers)
-# =========================================
-resilience4j:
-  circuitbreaker:
-    instances:
-      notification-service:
-        register-health-indicator: true
-        sliding-window-size: 10
-        permitted-number-of-calls-in-half-open-state: 3
-        sliding-window-type: count_based
-        minimum-number-of-calls: 5
-        wait-duration-in-open-state: 10s
-        failure-rate-threshold: 50
+jwt:
+  secret: ${JWT_SECRET:mySecretKey123!@#mustBe256BitsLongForHS256}
+  access-token-expiration: 900000 # 15 minutes
+  refresh-token-expiration: 604800000 # 7 days
 
-      user-profile-service:
-        register-health-indicator: true
-        sliding-window-size: 10
-        permitted-number-of-calls-in-half-open-state: 3
-        sliding-window-type: count_based
-        minimum-number-of-calls: 5
-        wait-duration-in-open-state: 10s
-        failure-rate-threshold: 50
-
-      external-auth:
-        register-health-indicator: true
-        sliding-window-size: 5              # Smaller window for external
-        permitted-number-of-calls-in-half-open-state: 2
-        sliding-window-type: count_based
-        minimum-number-of-calls: 3
-        wait-duration-in-open-state: 30s    # Longer wait for external
-        failure-rate-threshold: 60          # More tolerant of external failures
-  
-  retry:
-    instances:
-      notification-service:
-        max-attempts: 3
-        wait-duration: 1s
-        exponential-backoff-multiplier: 2
-
-      user-profile-service:
-        max-attempts: 3
-        wait-duration: 1s
-        exponential-backoff-multiplier: 2
-
-      external-auth:
-        max-attempts: 2                     # Fewer retries for external
-        wait-duration: 500ms
-        exponential-backoff-multiplier: 1.5
-
-  timelimiter:
-    instances:
-      notification-service:
-        timeout-duration: 8s
-
-      user-profile-service:
-        timeout-duration: 8s
-
-      external-auth:
-        timeout-duration: 5s                # Shorter timeout for external
-
-# =========================================
-# MANAGEMENT & MONITORING
-# =========================================
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,circuitbreakers,retries
+        include: health,info,metrics
   endpoint:
     health:
       show-details: always
-      show-components: always
-  health:
-    circuit breakers:
-      enabled: true
 
-# =========================================
-# LOGGING CONFIGURATION
-# =========================================
 logging:
   level:
-    com.ecommerce.campus.authservice: DEBUG
-    com.ecommerce.campus.authservice.infrastructure.external: DEBUG
-    org.springframework.cloud.openfeign: DEBUG
-    feign: DEBUG
-    org.springframework.cloud.consul: INFO
-
+    com.ecommerce.campus.auth-service: DEBUG
+    org.springframework.security: DEBUG
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{correlationId}] %logger{36} - %msg%n"
-
-# =========================================
-# EXTERNAL SERVICE URLS (for non-discovery)
-# =========================================
-external-services:
-  google-auth:
-    base-url: https://oauth2.googleapis.com
-  facebook-auth:
-    base-url: https://graph.facebook.com
-
-# =========================================
-# CUSTOM APPLICATION PROPERTIES
-# =========================================
-app:
-  external-services:
-    notification:
-      async: true                           # Send notifications asynchronously
-      retry-on-failure: true
-    user-profile:
-      async: true                           # Create profiles asynchronously
-      retry-on-failure: true
-    external-auth:
-      cache-results: true                   # Cache external auth validation
-      cache-ttl: 300                       # 5 minutes
-
----
-# =========================================
-# DEVELOPMENT PROFILE
-# =========================================
-spring:
-  config:
-    activate:
-      on-profile: dev
-
-  cloud:
-    openfeign:
-      client:
-        config:
-          default:
-            loggerLevel: full               # Full logging in development
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      notification-service:
-        failure-rate-threshold: 80          # More tolerant in dev
-      user-profile-service:
-        failure-rate-threshold: 80
-      external-auth:
-        failure-rate-threshold: 90
-
-logging:
-  level:
-    com.ecommerce.campus.authservice.infrastructure.external: TRACE
-    feign: DEBUG
-
----
-# =========================================
-# PRODUCTION PROFILE
-# =========================================
-spring:
-  config:
-    activate:
-      on-profile: prod
-
-  cloud:
-    openfeign:
-      client:
-        config:
-          default:
-            loggerLevel: basic              # Less logging in production
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      notification-service:
-        failure-rate-threshold: 30          # Stricter in production
-      user-profile-service:
-        failure-rate-threshold: 30
-      external-auth:
-        failure-rate-threshold: 40
-
-logging:
-  level:
-    com.ecommerce.campus.authservice.infrastructure.external: WARN
-    feign: WARN
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

@@ -3,14 +3,12 @@ package com.ecommerce.campus.authservice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication(scanBasePackages = {
-        "com.ecommerce.campus.auth",
-        "com.ecommerce.campus.common"
-})
+@SpringBootApplication
 @EnableDiscoveryClient
+@EnableScheduling // For token cleanup
 public class AuthServiceApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(AuthServiceApplication.class, args);
     }

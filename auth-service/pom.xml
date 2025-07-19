@@ -17,11 +17,6 @@
 
     <dependencies>
         <!-- Common module -->
-        <dependency>
-            <groupId>com.ecommerce.campus</groupId>
-            <artifactId>common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
 
         <!-- MapStruct for DTO mapping -->
         <dependency>
