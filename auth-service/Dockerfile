@@ -14,7 +14,7 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /app
 USER appuser
 
-# Expose port
+# Expose port, metadata
 EXPOSE 8081
 
 # Health check
