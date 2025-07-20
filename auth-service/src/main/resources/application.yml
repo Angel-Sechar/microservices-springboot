@@ -2,7 +2,7 @@ spring:
   application:
     name: auth-service
   config:
-    import: file:.env.local
+    import: file:.env
 
 server:
   port: ${PORT}

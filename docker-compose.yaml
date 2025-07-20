@@ -1,19 +1,44 @@
 version: '3.8'
 
 services:
+  # Auth Service
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: campus-auth-service
+    env_file:
+      - ../.env.shared
+      - ./auth-service/.env
+
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - sqlserver
+    networks:
+      - campus-network
+    volumes:
+      - auth_logs:/var/log/auth-service
+    restart: unless-stopped
+
   # MS SQL Server 2022 Database
   sqlserver:
-    image: 'mcr.microsoft.com/mssql/server:2022-latest'
+    image: 'mcr.microsoft.com/mssql/server:2022-CU12-ubuntu-22.04'
     container_name: campus-sqlserver
+    env_file:
+      - .env.shared
     environment:
       - 'ACCEPT_EULA=Y'
       - 'MSSQL_PID=Express'
-      - 'MSSQL_SA_PASSWORD=verYs3cret!'
-      - 'MSSQL_USER=campus_user'
-      - 'MSSQL_PASSWORD=campus_password'
-      - 'MSSQL_DATABASE=campus_auth'
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_USER=${DB_USERNAME}
+      - MSSQL_PASSWORD=${DB_PASSWORD}
+      - MSSQL_DATABASE=${DB_NAME}
+      - MSSQL_AGENT_ENABLED=${DB_MS_AGENT_ENABLED}
     ports:
-      - "1433:1433"
+      - ${DB_PORT}:${DB_PORT}
+
+    #Mounts inside the container
     volumes:
       - sqlserver_data:/var/opt/mssql
       - ./init-scripts:/docker-entrypoint-initdb.d
@@ -26,38 +51,12 @@ services:
     image: redis:7-alpine
     container_name: campus-redis
     ports:
-      - "6379:6379"
+      - ${REDIS_PORT}:${REDIS_PORT}
     networks:
       - campus-network
     restart: unless-stopped
 
-  # Auth Service
-  auth-service:
-    build:
-      context: ./auth-service
-      dockerfile: Dockerfile
-    container_name: campus-auth-service
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=campus_auth;encrypt=true;trustServerCertificate=true
-      SPRING_DATASOURCE_USERNAME: sa
-      SPRING_DATASOURCE_PASSWORD: verYs3cret!
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.microsoft.sqlserver.jdbc.SQLServerDriver
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.SQLServerDialect
-      # OPTIONAL FOR DEBUGGING
-      SPRING_JPA_SHOW_SQL: false
-      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
-    ports:
-      - "8081:8081"
-    depends_on:
-      - sqlserver
-    networks:
-      - campus-network
-    volumes:
-      - auth_logs:/var/log/auth-service
-    restart: unless-stopped
-
+#Declares the volume names
 volumes:
   sqlserver_data:
   auth_logs:
