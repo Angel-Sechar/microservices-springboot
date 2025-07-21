@@ -32,7 +32,7 @@ server:
     show-sql: ${JPA_SHOW_SQL}
 
   liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.xml
+    change-log: classpath:liquibase-changelog/db_auth-changelog.xml
     enabled: ${LIQUIBASE_ENABLED}
 
   redis:
@@ -55,6 +55,8 @@ server:
         service-name: ${spring.application.name}
         health-check-interval: ${CONSUL_HEALTH_INTERVAL}
         health-check-path: ${CONSUL_CHECK_PATH}
+        prefer-ip-address: ${PREFER_IP_ADDRESS}
+        register: true
 
 jwt:
   secret: ${JWT_SECRET}

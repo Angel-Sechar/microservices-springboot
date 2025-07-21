@@ -1,35 +1,46 @@
 spring:
   application:
     name: api-gateway
+  config:
+    import:
+      - file:.env.shared
+      - file:.env
 
   cloud:
     gateway:
       discovery:
         locator:
-          enabled: true
-          lower-case-service-id: true
+          enabled: ${GATEWAY_ENABLED}
+          lower-case-service-id: ${GATEWAY_LOWERCASE}
 
     consul:
-      host: localhost
-      port: 8500
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
       discovery:
+        enabled: ${CONSUL_ENABLED}
         service-name: ${spring.application.name}
-        health-check-interval: 10s
-        prefer-ip-address: true
-        register: true
+        health-check-interval: ${CONSUL_HEALTH_INTERVAL}
+        health-check-path: ${CONSUL_CHECK_PATH}
+        prefer-ip-address: ${PREFER_IP_ADDRESS}
+        register: false
+
 
 server:
-  port: 8080
+  port: ${PORT}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway
+        include: ${ACTUATOR_ENDPOINTS}
   endpoint:
     health:
-      show-details: always
+      show-details: ${ACTUATOR_SHOW_DETAILS}
 
 logging:
   level:
-    org.springframework.cloud.gateway: DEBUG
+    com.ecommerce.campus.auth-service: ${LOG_LEVEL_APP}
+    org.springframework.security: ${LOG_LEVEL_SECURITY}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
