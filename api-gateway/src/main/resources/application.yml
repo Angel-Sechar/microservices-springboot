@@ -1,10 +1,6 @@
 spring:
   application:
     name: api-gateway
-  config:
-    import:
-      - file:.env.shared
-      - file:.env
 
   cloud:
     gateway:

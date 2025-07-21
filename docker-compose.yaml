@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile
     container_name: campus-api-gateway
     env_file:
-      - ../.env.shared
+      - ./.env.shared
       - ./api-gateway/.env
     ports:
       - "${PORT}:${PORT}"
@@ -27,7 +27,7 @@ services:
       dockerfile: Dockerfile
     container_name: campus-auth-service
     env_file:
-      - ../.env.shared
+      - ./.env.shared
       - ./auth-service/.env
 
     ports:
@@ -46,7 +46,7 @@ services:
     image: 'mcr.microsoft.com/mssql/server:2022-CU12-ubuntu-22.04'
     container_name: campus-sqlserver
     env_file:
-      - .env.shared
+      - ./.env.shared
     environment:
       - 'ACCEPT_EULA=Y'
       - 'MSSQL_PID=Express'
