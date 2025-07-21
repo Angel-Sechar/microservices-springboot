@@ -18,5 +18,6 @@ public record RegisterRequest(
         String password,
 
         String firstName,
-        String lastName
+        String paternalSurname,
+        String maternalSurname
 ) {}

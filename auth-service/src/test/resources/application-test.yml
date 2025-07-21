@@ -1,35 +1,56 @@
 spring:
-  # Test database (H2 in-memory)
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+  application:
+    name: auth-service
+  config:
+    import:
+      - file:.env.shared
+      - file:.env
 
+  datasource:
+    url: jdbc:h2:mem:db_test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: create-drop
-    show-sql: false
-
+      ddl-auto: create-drop # This tells to the ORM to create and drop changes.Data Definition Language
+    show-sql: ${JPA_SHOW_SQL}
   liquibase:
-    enabled: false  # Disable Liquibase for tests
+    enabled: false  # Disable Liquibase for tests - the creations are handled by the ORM
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password:
+    timeout: ${REDIS_TIMEOUT}
+    lettuce:
+      pool:
+        max-active: ${REDIS_POOL_MAX}
+        max-idle: ${REDIS_POOL_IDLE}
+        min-idle: ${REDIS_POOL_MIN}
+  cloud:
+    consul:
+      enabled: false  # Disable Consul in test profile
 
-# Test JWT configuration
-auth:
-  jwt:
-    secret: test-secret-key-256-bits-minimum-for-hmac-sha256-algorithm-testing
-    access-token-expiration: PT1M      # 1 minute for testing
-    refresh-token-expiration: PT5M     # 5 minutes for testing
-    issuer: campus-ecommerce-test
+jwt:
+  secret: test-secret-qa
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION}
 
-# Disable security for some tests
-
-  security:
-    user:
-      name: test
-      password: test
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${ACTUATOR_ENDPOINTS}
+  endpoint:
+    health:
+      show-details: always
+  health:
+    readiness:
+      enabled: true
 
 logging:
   level:
     root: WARN
-    com.ecommerce.campus.auth: DEBUG
+    com.ecommerce.campus.auth-service: DEBUG
+    org.springframework.security: ${LOG_LEVEL_SECURITY}
+    org.hibernate.SQL: ${LOG_LEVEL_SQL}

@@ -7,12 +7,16 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.persistence.Transient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,10 +31,9 @@ public class JwtProvider {
 
     public JwtProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-expiration:900000}") long accessTokenExpiration, // 15 minutes
-            @Value("${jwt.refresh-token-expiration:604800000}") long refreshTokenExpiration) { // 7 days
+            @Value("${jwt.access-token-expiration}") long accessTokenExpiration,
+            @Value("${jwt.refresh-token-expiration}") long refreshTokenExpiration) {
 
-        //Is deprecated signWith(key, algorithm)
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
         this.accessTokenExpiration = accessTokenExpiration;
         this.refreshTokenExpiration = refreshTokenExpiration;
@@ -38,43 +41,38 @@ public class JwtProvider {
 
     // Generate access token with minimal claims for performance
     public String generateAccessToken(Long userId, String username, String roles) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiryDate = now.plus(Duration.ofMillis(refreshTokenExpiration));
+
+        Date issuedAt = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+        Date expiresAt = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", roles); // Single string, not array for smaller size
+        claims.put("role", roles); // Single string, not array for smaller size
 
         return Jwts.builder()
                 .subject(userId.toString()) // Just user ID, fetch details if needed
                 .claims(claims)
-                .issuedAt(now)
-                .expiration(expiryDate)
+                .issuedAt(issuedAt)
+                .expiration(expiresAt)
                 .signWith(this.key)
                 .compact();
     }
 
     // Simple refresh token - just a signed token with user ID
     public String generateRefreshToken(Long userId) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + refreshTokenExpiration);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiryDate = now.plus(Duration.ofMillis(refreshTokenExpiration));
+
+        Date issuedAt = Date.from(now.atZone(ZoneId.systemDefault()).toInstant());
+        Date expiresAt = Date.from(expiryDate.atZone(ZoneId.systemDefault()).toInstant());
 
         return Jwts.builder()
                 .subject(userId.toString())
-                .issuedAt(now)
-                .expiration(expiryDate)
+                .issuedAt(issuedAt)
+                .expiration(expiresAt)
                 .signWith(this.key)
                 .compact();
-    }
-
-    // Get user ID from token
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(this.key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-
-        return Long.parseLong(claims.getSubject());
     }
 
     // Validate token - simple and fast
@@ -99,18 +97,40 @@ public class JwtProvider {
         return false;
     }
 
-    // Get roles from token
-    public String getRolesFromToken(String token) {
-        Claims claims = Jwts.parser()
+    private Claims getClaimsFromToken(String token) {
+        return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
 
-        return claims.get("roles", String.class);
+    // Get user ID from token
+    public Long getUserIdFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return Long.parseLong(claims.getSubject());
+    }
+
+    // Get roles from token
+    public String getRolesFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("role", String.class);
+    }
+
+    public long getTimeToLiveMs(String token){
+        LocalDateTime now = LocalDateTime.now();
+
+        Claims claims = getClaimsFromToken(token);
+        LocalDateTime expiration = claims.getExpiration()
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        return Duration.between(now, expiration).toMillis();
     }
 
     public long getAccessTokenExpirationMs() {
         return accessTokenExpiration;
     }
+
 }

@@ -27,7 +27,7 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    @Cacheable(value = "users", key = "#username")
+    @Cacheable(value = "user", key = "#username")
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
@@ -50,7 +50,8 @@ public class UserService implements UserDetailsService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .firstName(request.firstName())
-                .lastName(request.lastName())
+                .paternalSurname(request.paternalSurname())
+                .maternalSurname(request.maternalSurname())
                 .roles(Set.of(new Role("ROLE_USER"))) // Default role
                 .build();
 
@@ -62,9 +63,9 @@ public class UserService implements UserDetailsService {
     }
 
     @Cacheable(value = "users", key = "#userId")
-    public User findById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new AuthException("User not found"));
+    public UserResponse findById(Long userId) {
+        return UserResponse.from(userRepository.findById(userId)
+                .orElseThrow(() -> new AuthException("User not found")));
     }
 }
 

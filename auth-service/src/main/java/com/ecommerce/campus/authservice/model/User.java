@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "users", indexes = {
+@Table(name = "user", indexes = {
         @Index(name = "idx_username", columnList = "username", unique = true),
         @Index(name = "idx_email", columnList = "email", unique = true)
 })
@@ -30,7 +30,8 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name= "user_id")
+    private Long userId;
 
     @Column(nullable = false, unique = true, length = 50)
     private String username;
@@ -38,18 +39,21 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String password;
 
     @Column(name = "first_name", length = 50)
     private String firstName;
 
-    @Column(name = "last_name", length = 50)
-    private String lastName;
+    @Column(name = "paternal_surname", length = 50)
+    private String paternalSurname;
+
+    @Column(name = "maternal_surname", length = 50)
+    private String maternalSurname;
 
     @Column(nullable = false)
     @Builder.Default
-    private boolean enabled = true;
+    private Boolean isActive = true;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
@@ -58,10 +62,10 @@ public class User implements UserDetails {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
-    // Eager fetch for performance - we always need roles
+    // Eager fetch for performance - This tells JPA to load the roles immediately when the user is loaded
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_roles",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
@@ -77,13 +81,13 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return isActive;
     }
 
     @Override
@@ -95,4 +99,15 @@ public class User implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return true;
     }
+
+    @Override
+    public boolean isEnabled(){
+        return isActive;
+    }
+
+    @Transient
+    public String getFullName() {
+        return String.format("%s %s %s", firstName, paternalSurname, maternalSurname);
+    }
+
 }

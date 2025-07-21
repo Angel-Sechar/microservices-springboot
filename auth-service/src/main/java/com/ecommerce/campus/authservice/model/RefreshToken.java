@@ -9,7 +9,7 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "refresh_tokens", indexes = {
+@Table(name = "refresh_token", indexes = {
         @Index(name = "idx_token", columnList = "token", unique = true),
         @Index(name = "idx_expiry", columnList = "expiry_date")
 })
@@ -21,7 +21,8 @@ public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "token_id")
+    private Long tokenId;
 
     @Column(nullable = false, unique = true)
     private String token;

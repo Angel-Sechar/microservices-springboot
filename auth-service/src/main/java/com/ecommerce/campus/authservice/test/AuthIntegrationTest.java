@@ -49,7 +49,8 @@ class AuthIntegrationTest {
                 "test@example.com",
                 "password123",
                 "Test",
-                "User"
+                "Dad",
+                "Mom"
         );
 
         mockMvc.perform(post("/api/auth/register")

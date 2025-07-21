@@ -9,21 +9,19 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/me")
+    @GetMapping("/thisUser")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal Long userId) {
-        User user = userService.findById(userId);
-        return ResponseEntity.ok(UserResponse.from(user));
+        return ResponseEntity.ok(userService.findById(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
-        User user = userService.findById(id);
-        return ResponseEntity.ok(UserResponse.from(user));
+        return ResponseEntity.ok(userService.findById(id));
     }
 }

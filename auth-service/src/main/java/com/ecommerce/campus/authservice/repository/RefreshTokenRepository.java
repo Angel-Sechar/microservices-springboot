@@ -20,7 +20,9 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     int deleteExpiredTokens(LocalDateTime now);
 
     // Delete all tokens for a user (logout from all devices)
+    //thinking how to indicate devices
     @Modifying
     @Query("DELETE FROM RefreshToken rt WHERE rt.user.id = :userId")
     int deleteByUserId(Long userId);
+
 }

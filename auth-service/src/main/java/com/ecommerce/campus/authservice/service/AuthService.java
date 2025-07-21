@@ -3,10 +3,12 @@ package com.ecommerce.campus.authservice.service;
 import com.ecommerce.campus.authservice.dto.*;
 import com.ecommerce.campus.authservice.exception.AuthException;
 import com.ecommerce.campus.authservice.model.RefreshToken;
+import com.ecommerce.campus.authservice.model.Role;
 import com.ecommerce.campus.authservice.model.User;
 import com.ecommerce.campus.authservice.repository.RefreshTokenRepository;
 import com.ecommerce.campus.authservice.repository.UserRepository;
 import com.ecommerce.campus.authservice.security.JwtProvider;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -32,6 +34,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final AuthenticationManager authenticationManager;
+    private final TokenBlackListService tokenBlacklistService;
 
     @Transactional
     public TokenResponse login(LoginRequest request) {
@@ -44,7 +47,7 @@ public class AuthService {
             User user = (User) authentication.getPrincipal();
 
             // Update last login
-            userRepository.updateLastLogin(user.getId(), LocalDateTime.now());
+            userRepository.updateLastLogin(user.getUserId(), LocalDateTime.now());
 
             // Generate tokens
             String accessToken = generateAccessToken(user);
@@ -88,41 +91,43 @@ public class AuthService {
         );
     }
 
+
     @Transactional
     @CacheEvict(value = "users", key = "#userId")
     public void logout(Long userId, String token) {
         // Delete refresh token associated with this session
         refreshTokenRepository.deleteByUserId(userId);
 
-        // In production, you might want to blacklist the JWT token in Redis
-        // until it expires naturally
+        // Get Time To Live from JWT Token
+        long timeToLive = jwtProvider.getTimeToLiveMs(token) / 1000;
 
-        log.info("User {} logged out", userId);
+        // Add token to BlackList - redis
+        tokenBlacklistService.blacklistToken(token, timeToLive);
     }
 
     @Transactional
-    @CacheEvict(value = "users", key = "#userId")
+    @CacheEvict(value = "user", key = "#userId")
     public void logoutFromAllDevices(Long userId) {
         refreshTokenRepository.deleteByUserId(userId);
-        log.info("User {} logged out from all devices", userId);
+        //thinking to consider devices
     }
 
     private String generateAccessToken(User user) {
         String roles = user.getRoles().stream()
-                .map(role -> role.getName())
+                .map(Role::getRoleName)
                 .collect(Collectors.joining(","));
 
-        return jwtProvider.generateAccessToken(user.getId(), user.getUsername(), roles);
+        return jwtProvider.generateAccessToken(user.getUserId(), user.getUsername(), roles);
     }
 
     private RefreshToken createRefreshToken(User user) {
-        // Delete old refresh tokens if needed (optional: limit tokens per user)
-        // refreshTokenRepository.deleteByUserId(user.getId());
+        // Delete old refresh tokens - just for one device at the same time
+        refreshTokenRepository.deleteByUserId(user.getUserId());
 
         RefreshToken refreshToken = RefreshToken.builder()
-                .token(jwtProvider.generateRefreshToken(user.getId()))
+                .token(jwtProvider.generateRefreshToken(user.getUserId()))
                 .user(user)
-                .expiryDate(LocalDateTime.now().plusDays(7))
+                .expiryDate(LocalDateTime.now().plusSeconds(jwtProvider.getAccessTokenExpirationMs()/1000))
                 .build();
 
         return refreshTokenRepository.save(refreshToken);

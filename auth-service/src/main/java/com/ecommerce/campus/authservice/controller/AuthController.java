@@ -38,7 +38,14 @@ public class AuthController {
     public ResponseEntity<Void> logout(
             @AuthenticationPrincipal Long userId,
             @RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.substring(7); // Remove "Bearer "
+        String token = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        if (token == null) {
+            return ResponseEntity.badRequest().build();
+        }
         authService.logout(userId, token);
         return ResponseEntity.noContent().build();
     }

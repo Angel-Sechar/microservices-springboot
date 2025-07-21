@@ -15,6 +15,7 @@ services:
       - "${PORT}:${PORT}"
     depends_on:
       - sqlserver
+      - consul
     networks:
       - campus-network
     volumes:
@@ -55,7 +56,15 @@ services:
     networks:
       - campus-network
     restart: unless-stopped
-
+  #Consul for health check
+  consul:
+    image: consul:1.15
+    container_name: consul
+    ports:
+      - ${CONSUL_PORT}:${CONSUL_PORT} # Web UI / HTTP API
+    networks:
+      - campus-network
+    restart: unless-stopped
 #Declares the volume names
 volumes:
   sqlserver_data:
