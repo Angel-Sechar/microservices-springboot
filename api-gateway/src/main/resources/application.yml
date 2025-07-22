@@ -10,7 +10,7 @@ spring:
           lower-case-service-id: ${GATEWAY_LOWERCASE}
 
     consul:
-      host: ${CONSUL_HOST}
+      host: consul
       port: ${CONSUL_PORT}
       discovery:
         enabled: ${CONSUL_ENABLED}

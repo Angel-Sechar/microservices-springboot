@@ -1,4 +1,4 @@
-version: '3.8'
+#version: '3.8'
 
 services:
 
@@ -7,15 +7,18 @@ services:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
-    container_name: campus-api-gateway
+    container_name: api-gateway
     env_file:
-      - ./.env.shared
+      - .env
       - ./api-gateway/.env
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT_GATEWAY}:${PORT_GATEWAY}"
     depends_on:
       - auth-service
-      - consul
+      - ${CONSUL_HOST}
+    environment:
+      - CONSUL_HOST=${CONSUL_HOST}
+      - CONSUL_PORT=${CONSUL_PORT}
     networks:
       - campus-network
     restart: unless-stopped
@@ -25,16 +28,39 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
-    container_name: campus-auth-service
+    container_name: auth-service
     env_file:
-      - ./.env.shared
+      - .env
       - ./auth-service/.env
-
     ports:
-      - "${PORT}:${PORT}"
+      - "${PORT_AUTH}:${PORT_AUTH}"
     depends_on:
-      - sqlserver
-      - consul
+      - ${DB_HOST}
+      - ${CONSUL_HOST}
+    environment:
+      #Database
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_AUTH_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # Redis
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      # Consul
+      - CONSUL_HOST=${CONSUL_HOST}
+      - CONSUL_PORT=${CONSUL_PORT}
+      #Discovery
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
+      - SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME=auth-service
+      - SPRING_CLOUD_CONSUL_DISCOVERY_PREFER_IP_ADDRESS=${PREFER_IP_ADDRESS}
+      #Config
+      - SPRING_CLOUD_CONSUL_CONFIG_ENABLED=false
+      - SPRING_PROFILES_ACTIVE=dev
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_BOOT_AUTOCONFIGURE=DEBUG
+      - SPRING_MAIN_BANNER_MODE=off
+
     networks:
       - campus-network
     volumes:
@@ -44,43 +70,47 @@ services:
   # MS SQL Server 2022 Database
   sqlserver:
     image: 'mcr.microsoft.com/mssql/server:2022-CU12-ubuntu-22.04'
-    container_name: campus-sqlserver
+    container_name: ${DB_HOST}
     env_file:
-      - ./.env.shared
+      - .env
     environment:
-      - 'ACCEPT_EULA=Y'
-      - 'MSSQL_PID=Express'
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Express
       - MSSQL_SA_PASSWORD=${DB_PASSWORD}
-      - MSSQL_USER=${DB_USERNAME}
-      - MSSQL_PASSWORD=${DB_PASSWORD}
-      - MSSQL_DATABASE=${DB_NAME}
-      - MSSQL_AGENT_ENABLED=${DB_MS_AGENT_ENABLED}
+
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - "${DB_PORT}:${DB_PORT}"
 
     #Mounts inside the container
     volumes:
       - sqlserver_data:/var/opt/mssql
-      - ./init-scripts:/docker-entrypoint-initdb.d
+      - ./init/creation-database-v01.sql:/init/creation-database-v01.sql
+    command: >
+      bash -c "
+        /opt/mssql/bin/sqlserver & 
+        sleep 30 && 
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${DB_PASSWORD} -i /init/creation-database-v01.sql
+      "
     networks:
       - campus-network
     restart: unless-stopped
 
-  # Redis for caching (future use)
+  # Redis for caching
   redis:
     image: redis:7-alpine
-    container_name: campus-redis
+    container_name: ${REDIS_HOST}
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
       - campus-network
     restart: unless-stopped
+
   #Consul for health check
   consul:
     image: consul:1.15
-    container_name: consul
+    container_name: ${CONSUL_HOST}
     ports:
-      - ${CONSUL_PORT}:${CONSUL_PORT} # Web UI / HTTP API
+      - "${CONSUL_PORT}:${CONSUL_PORT}" # Web UI / HTTP API
     networks:
       - campus-network
     restart: unless-stopped

@@ -24,6 +24,16 @@
             <artifactId>common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <!--Gateway (microservice)-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <!--Gateway (MVC pattern)-->
+        <!--		<dependency>-->
+        <!--			<groupId>org.springframework.cloud</groupId>-->
+        <!--			<artifactId>spring-cloud-starter-gateway-mvc</artifactId>  &lt;!&ndash; MVC version &ndash;&gt;-->
+        <!--		</dependency>-->
     </dependencies>
 
     <build>

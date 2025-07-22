@@ -1,9 +1,27 @@
 spring:
   application:
     name: auth-service
+  main:
+    web-application-type: servlet
+    allow-bean-definition-overriding: true
 
 server:
   port: ${PORT}
+
+
+# Separate SpringDoc configuration
+#springdoc:
+#  enable-actuator: false
+#  api-docs:
+#    enabled: true
+#    path: /v3/api-docs
+#  swagger-ui:
+#    enabled: true
+#    path: /swagger-ui.html
+#    operations-sorter: method
+#  show-actuator: false
+#
+
 
   datasource:
     url: jdbc:sqlserver://${DB_HOST}:${DB_PORT};databaseName=${DB_NAME};encrypt=${DB_ENCRYPT};trustServerCertificate=${DB_TRUST_CERT}
@@ -53,6 +71,8 @@ server:
         health-check-path: ${CONSUL_CHECK_PATH}
         prefer-ip-address: ${PREFER_IP_ADDRESS}
         register: true
+      config:
+        enabled: false
 
 jwt:
   secret: ${JWT_SECRET}
@@ -63,7 +83,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: ${ACTUATOR_ENDPOINTS}
+        include: health,info
+      endpoints:
+        web:
+          base-path: /actuator/health
   endpoint:
     health:
       show-details: ${ACTUATOR_SHOW_DETAILS}

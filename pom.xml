@@ -26,8 +26,9 @@
 	<properties>
 		<java.version>21</java.version>
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
-		<springdoc.version>2.6.0</springdoc.version>
+		<springdoc.version>2.5.0</springdoc.version>
 		<jjwt.version>0.12.3</jjwt.version>
+		<testcontainers.version>1.19.8</testcontainers.version>
 	</properties>
 <!--	<repositories>-->
 <!--		<repository>-->
@@ -127,22 +128,19 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-consul-config</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!--Consul Discovery-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-consul-discovery</artifactId>
 		</dependency>
-		<!--Gateway (microservice)-->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-gateway</artifactId>
-		</dependency>
-		<!--Gateway (MVC pattern)-->
-		<!--		<dependency>-->
-		<!--			<groupId>org.springframework.cloud</groupId>-->
-		<!--			<artifactId>spring-cloud-starter-gateway-mvc</artifactId>  &lt;!&ndash; MVC version &ndash;&gt;-->
-		<!--		</dependency>-->
+
 		<!--Cloud LoadBalancer-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -171,12 +169,12 @@
 		<!-- ========================================= -->
 		<!-- DOCUMENTATION                           -->
 		<!-- ========================================= -->
-		<!-- SpringDoc OpenAPI -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>${springdoc.version}</version>
-		</dependency>
+<!--		 SpringDoc OpenAPI -->
+<!--		<dependency>-->
+<!--			<groupId>org.springdoc</groupId>-->
+<!--			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>-->
+<!--			<version>${springdoc.version}</version>-->
+<!--		</dependency>-->
 
 		<!-- ========================================= -->
 		<!-- DEVELOPMENT TOOLS                       -->
@@ -223,16 +221,8 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<version>RELEASE</version>
+			<version>7.11.0</version>
 			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers-bom</artifactId>
-			<version>${testcontainers.version}</version>
-			<type>pom</type>
-			<scope>import</scope>
 		</dependency>
 
 		<!-- Individual Test containers modules -->
@@ -303,7 +293,13 @@
 				<artifactId>commons-collections4</artifactId>
 				<version>4.4</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 
 	</dependencyManagement>
