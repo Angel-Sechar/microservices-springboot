@@ -1,30 +1,14 @@
 spring:
   application:
     name: auth-service
-  main:
-    web-application-type: servlet
-    allow-bean-definition-overriding: true
 
-server:
-  port: ${PORT}
-
-
-# Separate SpringDoc configuration
-#springdoc:
-#  enable-actuator: false
-#  api-docs:
-#    enabled: true
-#    path: /v3/api-docs
-#  swagger-ui:
-#    enabled: true
-#    path: /swagger-ui.html
-#    operations-sorter: method
-#  show-actuator: false
-#
+  liquibase:
+    change-log: classpath:liquibase-changelog/db_auth-changelog.xml
+    enabled: ${LIQUIBASE_ENABLED}
 
 
   datasource:
-    url: jdbc:sqlserver://${DB_HOST}:${DB_PORT};databaseName=${DB_NAME};encrypt=${DB_ENCRYPT};trustServerCertificate=${DB_TRUST_CERT}
+    url: jdbc:sqlserver://${DB_HOST}:${DB_PORT};databaseName=${DB_AUTH_NAME};encrypt=${DB_ENCRYPT};trustServerCertificate=${DB_TRUST_CERT}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -33,6 +17,27 @@ server:
       minimum-idle: ${DB_MIN_IDLE}
       connection-timeout: ${DB_TIMEOUT}
 
+server:
+  port: ${PORT_AUTH}
+
+## Separate SpringDoc configuration
+springdoc:
+  enable-actuator: false
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+  show-actuator: false
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION}
+
+#JPA
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO}
@@ -45,9 +50,8 @@ server:
         order_inserts: true
     show-sql: ${JPA_SHOW_SQL}
 
-  liquibase:
-    change-log: classpath:liquibase-changelog/db_auth-changelog.xml
-    enabled: ${LIQUIBASE_ENABLED}
+
+
 
   redis:
     host: ${REDIS_HOST}
@@ -74,16 +78,14 @@ server:
       config:
         enabled: false
 
-jwt:
-  secret: ${JWT_SECRET}
-  access-token-expiration: ${JWT_ACCESS_EXPIRATION}
-  refresh-token-expiration: ${JWT_REFRESH_EXPIRATION}
-
+#Actuator
 management:
+#  server:
+#    port: ${PORT_AUTH}
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: ${ACTUATOR_ENDPOINTS}
       endpoints:
         web:
           base-path: /actuator/health
@@ -98,5 +100,9 @@ logging:
     com.ecommerce.campus.auth-service: ${LOG_LEVEL_APP}
     org.springframework.security: ${LOG_LEVEL_SECURITY}
     org.hibernate.SQL: ${LOG_LEVEL_SQL}
+    org.springframework.boot.context.config: DEBUG
+    liquibase: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+debug: true

@@ -2,6 +2,9 @@ spring:
   application:
     name: api-gateway
 
+server:
+  port: ${PORT_GATEWAY}
+
   cloud:
     gateway:
       discovery:
@@ -11,7 +14,7 @@ spring:
 
     consul:
       host: consul
-      port: ${CONSUL_PORT}
+      port: ${PORT_GATEWAY}
       discovery:
         enabled: ${CONSUL_ENABLED}
         service-name: ${spring.application.name}
@@ -21,8 +24,6 @@ spring:
         register: false
 
 
-server:
-  port: ${PORT}
 
 management:
   endpoints:

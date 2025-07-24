@@ -1,6 +1,6 @@
 package com.ecommerce.campus.authservice.service;
 
-import com.ecommerce.campus.authservice.repository.RefreshTokenRepository;
+import com.ecommerce.campus.authservice.persistence.jpa.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

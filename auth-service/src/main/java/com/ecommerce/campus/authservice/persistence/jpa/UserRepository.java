@@ -1,4 +1,4 @@
-package com.ecommerce.campus.authservice.repository;
+package com.ecommerce.campus.authservice.persistence.jpa;
 
 import com.ecommerce.campus.authservice.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

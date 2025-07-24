@@ -14,7 +14,6 @@ services:
     ports:
       - "${PORT_GATEWAY}:${PORT_GATEWAY}"
     depends_on:
-      - auth-service
       - ${CONSUL_HOST}
     environment:
       - CONSUL_HOST=${CONSUL_HOST}
@@ -84,16 +83,26 @@ services:
     #Mounts inside the container
     volumes:
       - sqlserver_data:/var/opt/mssql
-      - ./init/creation-database-v01.sql:/init/creation-database-v01.sql
-    command: >
-      bash -c "
-        /opt/mssql/bin/sqlserver & 
-        sleep 30 && 
-        /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${DB_PASSWORD} -i /init/creation-database-v01.sql
-      "
+      - ./init/creation-database-v01.sql:/docker-entrypoint-initdb.d/creation-database-v01.sql
+
     networks:
       - campus-network
     restart: unless-stopped
+
+  #To initialize
+  init-db:
+    image: mcr.microsoft.com/mssql-tools
+    depends_on:
+      - ${DB_HOST}
+    entrypoint: >
+      bash -c "
+        sleep 40 && 
+        /opt/mssql-tools/bin/sqlcmd -S ${DB_HOST} -U SA -P ${DB_PASSWORD} -i /init/creation-database-v01.sql
+      "
+    volumes:
+      - ./init/creation-database-v01.sql:/init/creation-database-v01.sql
+    networks:
+      - campus-network
 
   # Redis for caching
   redis:

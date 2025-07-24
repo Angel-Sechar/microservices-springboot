@@ -5,14 +5,12 @@ import com.ecommerce.campus.authservice.exception.AuthException;
 import com.ecommerce.campus.authservice.model.RefreshToken;
 import com.ecommerce.campus.authservice.model.Role;
 import com.ecommerce.campus.authservice.model.User;
-import com.ecommerce.campus.authservice.repository.RefreshTokenRepository;
-import com.ecommerce.campus.authservice.repository.UserRepository;
+import com.ecommerce.campus.authservice.persistence.jpa.RefreshTokenRepository;
+import com.ecommerce.campus.authservice.persistence.jpa.UserRepository;
 import com.ecommerce.campus.authservice.security.JwtProvider;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
@@ -36,6 +33,11 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final TokenBlackListService tokenBlacklistService;
 
+    /**
+     * TokenResponse
+      * @param request The Login data to generate token
+     * @return TokenResponse the token generated
+     */
     @Transactional
     public TokenResponse login(LoginRequest request) {
         try {
