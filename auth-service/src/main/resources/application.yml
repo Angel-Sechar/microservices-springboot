@@ -3,9 +3,9 @@ spring:
     name: auth-service
 
   liquibase:
-    change-log: classpath:liquibase-changelog/db_auth-changelog.xml
-    enabled: ${LIQUIBASE_ENABLED}
-
+    change-log: classpath:/liquibase-changelog/db_auth-changelog.xml
+    enabled: true
+    clear-checksums: true
 
   datasource:
     url: jdbc:sqlserver://${DB_HOST}:${DB_PORT};databaseName=${DB_AUTH_NAME};encrypt=${DB_ENCRYPT};trustServerCertificate=${DB_TRUST_CERT}
@@ -97,9 +97,9 @@ management:
       enabled: ${REDIS_READINESS}
 logging:
   level:
-    com.ecommerce.campus.auth-service: ${LOG_LEVEL_APP}
-    org.springframework.security: ${LOG_LEVEL_SECURITY}
-    org.hibernate.SQL: ${LOG_LEVEL_SQL}
+    com.ecommerce.campus.auth-service: DEBUG
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
     org.springframework.boot.context.config: DEBUG
     liquibase: DEBUG
   pattern:

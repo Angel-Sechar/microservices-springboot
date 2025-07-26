@@ -60,6 +60,7 @@ services:
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_BOOT_AUTOCONFIGURE=DEBUG
       - SPRING_MAIN_BANNER_MODE=off
 
+
     networks:
       - campus-network
     volumes:

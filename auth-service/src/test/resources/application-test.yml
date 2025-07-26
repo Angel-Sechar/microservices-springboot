@@ -3,7 +3,7 @@ spring:
     name: auth-service
   config:
     import:
-      - file:.env.shared
+      - file:../.env
       - file:.env
 
   datasource:
@@ -11,6 +11,7 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.h2.Driver
+
   jpa:
     hibernate:
       ddl-auto: create-drop # This tells to the ORM to create and drop changes.Data Definition Language

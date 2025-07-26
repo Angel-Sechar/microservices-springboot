@@ -11,13 +11,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-//        (exclude = {
-//        org.springframework.boot.actuate.autoconfigure.web.server.ManagementContextAutoConfiguration.class
-//})
 @EnableDiscoveryClient
 @ComponentScan(basePackages = "com.ecommerce.campus")
 @EnableScheduling // For token cleanup
-@EnableAutoConfiguration
 public class AuthServiceApplication {
 
     public static void main(String[] args) {

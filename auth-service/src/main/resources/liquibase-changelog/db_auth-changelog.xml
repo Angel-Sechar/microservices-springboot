@@ -4,6 +4,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
-    <include file="liquibase-changelog/changesets/20252107_Initial_001.xml" relativeToChangelogFile="true"/>
-
+ <changeSet id="20250725" author="Angel J. Sechar Valdez">
+    <sqlFile path="changesets/dbo/20250721_Initial_001.sql" relativeToChangelogFile="true" encoding="UTF-8" splitStatements="false"
+             stripComments="false"/>
+ </changeSet>
 </databaseChangeLog>
