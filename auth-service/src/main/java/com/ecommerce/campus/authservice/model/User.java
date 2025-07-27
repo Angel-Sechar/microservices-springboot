@@ -17,20 +17,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "user", indexes = {
-        @Index(name = "idx_username", columnList = "username", unique = true),
-        @Index(name = "idx_email", columnList = "email", unique = true)
+@Table(name = "auth_user", indexes = {
+        @Index(name = "uq_person_person_user", columnList = "auth_username", unique = true),
+        @Index(name = "uq_person_email", columnList = "email", unique = true)
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"roles", "refreshTokens"})
+@EqualsAndHashCode(exclude = {"roles", "authTokens"})
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name= "user_id")
+    @Column(name= "auth_userid")
     private Long userId;
 
     @Column(nullable = false, unique = true, length = 50)
@@ -75,7 +75,7 @@ public class User implements UserDetails {
     // Cascade delete refresh tokens when user is deleted
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private Set<RefreshToken> refreshTokens = new HashSet<>();
+    private Set<AuthToken> authTokens = new HashSet<>();
 
     // UserDetails implementation
     @Override

@@ -9,34 +9,34 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "refresh_token", indexes = {
-        @Index(name = "idx_token", columnList = "token", unique = true),
-        @Index(name = "idx_expiry", columnList = "expiry_date")
+@Table(name = "auth_token", indexes = {
+        @Index(name = "ix_uq_token", columnList = "auth_token", unique = true),
+        @Index(name = "ixn_expiry", columnList = "expiration_at")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RefreshToken {
+public class AuthToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "token_id")
+    @Column(name = "auth_token_id")
     private Long tokenId;
 
     @Column(nullable = false, unique = true)
     private String token;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "auth_user_id", nullable = false)
     private User user;
 
-    @Column(name = "expiry_date", nullable = false)
+    @Column(name = "expiration_at", nullable = false)
     private LocalDateTime expiryDate;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_on", nullable = false)
     @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdOn = LocalDateTime.now();
 
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiryDate);

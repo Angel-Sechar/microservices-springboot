@@ -2,7 +2,7 @@ package com.ecommerce.campus.authservice.service;
 
 import com.ecommerce.campus.authservice.dto.*;
 import com.ecommerce.campus.authservice.exception.AuthException;
-import com.ecommerce.campus.authservice.model.RefreshToken;
+import com.ecommerce.campus.authservice.model.AuthToken;
 import com.ecommerce.campus.authservice.model.Role;
 import com.ecommerce.campus.authservice.model.User;
 import com.ecommerce.campus.authservice.persistence.jpa.RefreshTokenRepository;
@@ -53,13 +53,13 @@ public class AuthService {
 
             // Generate tokens
             String accessToken = generateAccessToken(user);
-            RefreshToken refreshToken = createRefreshToken(user);
+            AuthToken authToken = createRefreshToken(user);
 
             log.info("User {} logged in successfully", user.getUsername());
 
             return new TokenResponse(
                     accessToken,
-                    refreshToken.getToken(),
+                    authToken.getToken(),
                     jwtProvider.getAccessTokenExpirationMs() / 1000, // Convert to seconds
                     UserResponse.from(user)
             );
@@ -72,22 +72,22 @@ public class AuthService {
 
     @Transactional
     public TokenResponse refreshToken(RefreshTokenRequest request) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(request.refreshToken())
+        AuthToken authToken = refreshTokenRepository.findByToken(request.refreshToken())
                 .orElseThrow(() -> new AuthException("Invalid refresh token"));
 
-        if (refreshToken.isExpired()) {
-            refreshTokenRepository.delete(refreshToken);
+        if (authToken.isExpired()) {
+            refreshTokenRepository.delete(authToken);
             throw new AuthException("Refresh token expired");
         }
 
-        User user = refreshToken.getUser();
+        User user = authToken.getUser();
         String newAccessToken = generateAccessToken(user);
 
         log.info("Token refreshed for user: {}", user.getUsername());
 
         return new TokenResponse(
                 newAccessToken,
-                refreshToken.getToken(),
+                authToken.getToken(),
                 jwtProvider.getAccessTokenExpirationMs() / 1000,
                 UserResponse.from(user)
         );
@@ -122,16 +122,16 @@ public class AuthService {
         return jwtProvider.generateAccessToken(user.getUserId(), user.getUsername(), roles);
     }
 
-    private RefreshToken createRefreshToken(User user) {
+    private AuthToken createRefreshToken(User user) {
         // Delete old refresh tokens - just for one device at the same time
         refreshTokenRepository.deleteByUserId(user.getUserId());
 
-        RefreshToken refreshToken = RefreshToken.builder()
+        AuthToken authToken = AuthToken.builder()
                 .token(jwtProvider.generateRefreshToken(user.getUserId()))
                 .user(user)
                 .expiryDate(LocalDateTime.now().plusSeconds(jwtProvider.getAccessTokenExpirationMs()/1000))
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        return refreshTokenRepository.save(authToken);
     }
 }
