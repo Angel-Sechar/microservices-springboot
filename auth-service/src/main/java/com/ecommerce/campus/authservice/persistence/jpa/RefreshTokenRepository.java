@@ -1,28 +1,32 @@
 package com.ecommerce.campus.authservice.persistence.jpa;
 
-import com.ecommerce.campus.authservice.model.AuthToken;
+import com.ecommerce.campus.authservice.model.RefreshToken;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<AuthToken, Long> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
-    Optional<AuthToken> findByToken(String token);
-        //Move to sp after
+    Optional<RefreshToken> findByToken(String token);
+
     // Clean up expired tokens
+    @Transactional
     @Modifying
-    @Query("DELETE FROM AuthToken rt WHERE rt.expiryDate < :now")
-    int deleteExpiredTokens(LocalDateTime now);
+    @Procedure(procedureName = "SP_REFRESH_TOKEN_DEL_EXPIRED_TOKENS")
+    int deleteExpiredTokens(@Param("ExpirationDate") LocalDateTime now);
 
     // Delete all tokens for a user (logout from all devices)
-    //thinking how to indicate devices
+    //thinking how to indicate by device
+    @Transactional
     @Modifying
-    @Query("DELETE FROM AuthToken rt WHERE rt.user.id = :userId")
-    int deleteByUserId(Long userId);
+    @Procedure(procedureName = "SP_REFRESH_TOKEN_DEL_LOGOUT_USER")
+    int deleteTokensByUserId(@Param("UserId") Long userId);
 
 }

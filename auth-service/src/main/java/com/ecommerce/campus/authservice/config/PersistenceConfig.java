@@ -1,5 +1,6 @@
 package com.ecommerce.campus.authservice.config;
 
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -11,6 +12,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 )
 @EnableRedisRepositories(
         basePackages = "com.ecommerce.campus.authservice.persistence.redis"
+)
+@EntityScan(
+        basePackages = "com.ecommerce.campus.authservice.model"
 )
 @EnableTransactionManagement
 public class PersistenceConfig {

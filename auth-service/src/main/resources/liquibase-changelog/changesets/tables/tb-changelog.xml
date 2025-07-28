@@ -4,8 +4,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
-    <include file="changesets/tables/tb-changelog.xml" relativeToChangelogFile="true"/>
-    <include file="changesets/storedprocedures/sp-changelog.xml" relativeToChangelogFile="true"/>
-    <include file="changesets/datadictionaries/dd-changelog.xml" relativeToChangelogFile="true"/>
+    <changeSet id="20250725-TABLES" author="Angel J. Sechar Valdez">
+        <sqlFile path="TB_20250721_Initial_001.sql" relativeToChangelogFile="true" encoding="UTF-8" splitStatements="false" stripComments="false"/>
+       </changeSet>
 
 </databaseChangeLog>

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"roles", "authTokens"})
+@EqualsAndHashCode(exclude = {"roles", "refreshTokens"})
 public class User implements UserDetails {
 
     @Id
@@ -75,7 +75,7 @@ public class User implements UserDetails {
     // Cascade delete refresh tokens when user is deleted
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private Set<AuthToken> authTokens = new HashSet<>();
+    private Set<RefreshToken> refreshTokens = new HashSet<>();
 
     // UserDetails implementation
     @Override

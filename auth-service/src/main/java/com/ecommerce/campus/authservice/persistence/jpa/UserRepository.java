@@ -24,6 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Update last login - simple and direct (create sp urgent)
     @Modifying
-    @Query("UPDATE User u SET u.lastLogin = :lastLogin WHERE u.id = :userId")
+    @Query("UPDATE auth_user u SET u.lastLogin = :lastLogin WHERE u.id = :userId")
     void updateLastLogin(@Param("userId") Long userId, @Param("lastLogin") LocalDateTime lastLogin);
 }
