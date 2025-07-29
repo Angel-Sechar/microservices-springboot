@@ -36,6 +36,7 @@ services:
     depends_on:
       - ${DB_HOST}
       - ${CONSUL_HOST}
+      - ${REDIS_HOST}
     environment:
       #Database
       - DB_HOST=${DB_HOST}

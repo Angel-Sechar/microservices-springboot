@@ -31,7 +31,7 @@ CREATE NONCLUSTERED INDEX nix_refresh_token_token ON DBO.refresh_token (token)
 INCLUDE (auth_userid, expiration_at, creation_on);
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE auth_role (
-    role_id BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED,
+    auth_roleid BIGINT IDENTITY(1,1) PRIMARY KEY CLUSTERED,
     role_name VARCHAR(50) NOT NULL UNIQUE
 );
 

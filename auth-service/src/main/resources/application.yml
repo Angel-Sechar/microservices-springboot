@@ -51,11 +51,10 @@ jwt:
     show-sql: ${JPA_SHOW_SQL}
 
 
-
-
   redis:
     host: ${REDIS_HOST}
     port: ${REDIS_PORT}
+    username: ${REDIS_USERNAME}
     password: ${REDIS_PASSWORD}
     timeout: ${REDIS_TIMEOUT}
     lettuce:
@@ -85,7 +84,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: ${ACTUATOR_ENDPOINTS}
+        include: always #${ACTUATOR_ENDPOINTS}
       endpoints:
         web:
           base-path: /actuator/health

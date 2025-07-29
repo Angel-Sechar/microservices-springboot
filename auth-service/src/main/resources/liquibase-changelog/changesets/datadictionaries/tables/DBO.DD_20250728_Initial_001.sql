@@ -140,13 +140,13 @@ EXEC sys.sp_addextendedproperty
     @level0type = N'SCHEMA', @level0name = N'DBO',  
     @level1type = N'TABLE', @level1name = N'auth_role';
 
--- Column: role_id
+-- Column: auth_roleid
 EXEC sys.sp_addextendedproperty  
     @name = N'MS_Description',  
     @value = N'Identifier of the auth_role table (Primary Key).',  
     @level0type = N'SCHEMA', @level0name = N'DBO',  
     @level1type = N'TABLE', @level1name = N'auth_role',  
-    @level2type = N'COLUMN', @level2name = N'role_id';
+    @level2type = N'COLUMN', @level2name = N'auth_roleid';
 
 -- Column: role_name
 EXEC sys.sp_addextendedproperty  

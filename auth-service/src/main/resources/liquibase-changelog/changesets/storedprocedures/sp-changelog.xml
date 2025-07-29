@@ -4,9 +4,10 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
-    <changeSet id="20250725-SP" author="Angel J. Sechar Valdez">
+    <changeSet id="20250725-SP" author="Angel J. Sechar Valdez" runOnChange="true">
         <sqlFile path="DBO.SP_REFRESH_TOKEN_DEL_EXPIRED_TOKENS.sql" relativeToChangelogFile="true" encoding="UTF-8" splitStatements="false" stripComments="false"/>
         <sqlFile path="DBO.SP_REFRESH_TOKEN_DEL_LOGOUT_USER.sql" relativeToChangelogFile="true" encoding="UTF-8" splitStatements="false" stripComments="false"/>
+        <sqlFile path="DBO.SP_AUTH_USER_UPD_LASTLOGIN.sql" relativeToChangelogFile="true" encoding="UTF-8" splitStatements="false" stripComments="false"/>
     </changeSet>
 
 </databaseChangeLog>

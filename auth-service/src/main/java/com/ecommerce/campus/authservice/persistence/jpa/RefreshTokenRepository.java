@@ -4,6 +4,7 @@ import com.ecommerce.campus.authservice.model.RefreshToken;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,14 +20,15 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     // Clean up expired tokens
     @Transactional
     @Modifying
-    @Procedure(procedureName = "SP_REFRESH_TOKEN_DEL_EXPIRED_TOKENS")
+    @Procedure(procedureName = "DBO.SP_REFRESH_TOKEN_DEL_EXPIRED_TOKENS")
+    //@Query(value = "EXEC DBO.SP_REFRESH_TOKEN_DEL_EXPIRED_TOKENS @ExpirationDate = :ExpirationDate", nativeQuery = true)
     int deleteExpiredTokens(@Param("ExpirationDate") LocalDateTime now);
 
     // Delete all tokens for a user (logout from all devices)
     //thinking how to indicate by device
     @Transactional
     @Modifying
-    @Procedure(procedureName = "SP_REFRESH_TOKEN_DEL_LOGOUT_USER")
-    int deleteTokensByUserId(@Param("UserId") Long userId);
+    @Procedure(procedureName = "DBO.SP_REFRESH_TOKEN_DEL_LOGOUT_USER")
+    void deleteTokensByUserId(@Param("UserId") Long userId);
 
 }

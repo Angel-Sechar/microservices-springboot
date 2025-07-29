@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor //Lombok annotation to implicit constructor at compile time
 @Slf4j
 public class AuthService {
 
@@ -41,7 +41,7 @@ public class AuthService {
     @Transactional
     public TokenResponse login(LoginRequest request) {
         try {
-            // Authenticate user
+            // Authenticate user - it internally matches the hashed password with the one in repository
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.username(), request.password())
             );

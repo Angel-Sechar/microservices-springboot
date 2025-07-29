@@ -4,6 +4,7 @@ import com.ecommerce.campus.authservice.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Update last login - simple and direct (create sp urgent)
     @Modifying
-    @Query("UPDATE auth_user u SET u.lastLogin = :lastLogin WHERE u.id = :userId")
-    void updateLastLogin(@Param("userId") Long userId, @Param("lastLogin") LocalDateTime lastLogin);
+    @Procedure(procedureName = "DBO.SP_AUTH_USER_UPD_LASTLOGIN")
+    void updateLastLogin(@Param("UserId") Long userId, @Param("LastLogin") LocalDateTime lastLogin);
 }

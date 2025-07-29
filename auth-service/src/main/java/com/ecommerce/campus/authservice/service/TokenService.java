@@ -21,7 +21,10 @@ public class TokenService {
     @Transactional
     public void cleanupExpiredTokens() {
         int deleted = refreshTokenRepository.deleteExpiredTokens(LocalDateTime.now());
-        if (deleted > 0) {
+        if (deleted < 0){
+            log.info("Error when deleting expired token");
+        }
+        if (deleted >= 0) {
             log.info("Cleaned up {} expired refresh tokens", deleted);
         }
     }
