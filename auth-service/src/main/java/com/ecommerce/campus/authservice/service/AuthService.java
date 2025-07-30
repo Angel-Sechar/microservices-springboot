@@ -95,7 +95,7 @@ public class AuthService {
 
 
     @Transactional
-    @CacheEvict(value = "users", key = "#userId")
+//    @CacheEvict(value = "users", key = "#userId")
     public void logout(Long userId, String token) {
         // Delete refresh token associated with this session
         refreshTokenRepository.deleteTokensByUserId(userId);
@@ -108,7 +108,7 @@ public class AuthService {
     }
 
     @Transactional
-    @CacheEvict(value = "user", key = "#userId")
+//    @CacheEvict(value = "user", key = "#userId")
     public void logoutFromAllDevices(Long userId) {
         refreshTokenRepository.deleteTokensByUserId(userId);
         //thinking to consider devices

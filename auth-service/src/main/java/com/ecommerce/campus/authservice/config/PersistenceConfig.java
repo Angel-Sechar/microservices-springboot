@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 )
 @EntityScan(
         basePackages = "com.ecommerce.campus.authservice.model"
-)
+    )
 @EnableTransactionManagement
 public class PersistenceConfig {
 

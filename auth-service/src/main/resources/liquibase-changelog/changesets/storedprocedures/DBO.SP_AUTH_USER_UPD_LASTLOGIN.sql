@@ -24,7 +24,7 @@ BEGIN
 SET NOCOUNT ON;
 
     UPDATE U
-    SET U.last_login = @LastLogin
+    SET U.last_login = @LastLogin   
     FROM DBO.auth_user U
     WHERE U.auth_userid = @UserId;
 
