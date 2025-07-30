@@ -19,14 +19,14 @@ spring:
 
   #Redis
   redis:
-    host: redis
-    port: 6379
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
     timeout: ${REDIS_TIMEOUT}
     lettuce:
       pool:
-        max-active: ${REDIS_POOL_MAX}
-        max-idle: ${REDIS_POOL_IDLE}
-        min-idle: ${REDIS_POOL_MIN}
+        max-active: ${REDIS_POOL_MAX_ACTIVE}
+        max-idle: ${REDIS_POOL_MAX_IDLE}
+        min-idle: ${REDIS_POOL_MIN_IDLE}
 
 
 server:
@@ -74,7 +74,7 @@ jwt:
         prefer-ip-address: ${PREFER_IP_ADDRESS}
         register: true
       config:
-        enabled: true
+        enabled: false
 
 #Actuator
 management:
