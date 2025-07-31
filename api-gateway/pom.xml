@@ -18,12 +18,12 @@
 
     <dependencies>
 
-        <!-- Common module -->
-        <dependency>
-            <groupId>com.ecommerce.campus</groupId>
-            <artifactId>common</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+<!--        &lt;!&ndash; Common module &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.ecommerce.campus</groupId>-->
+<!--            <artifactId>common</artifactId>-->
+<!--            <version>0.0.1-SNAPSHOT</version>-->
+<!--        </dependency>-->
         <!--Gateway (microservice)-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

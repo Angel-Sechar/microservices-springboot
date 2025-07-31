@@ -1,20 +1,15 @@
 spring:
   application:
     name: api-gateway
-
-server:
-  port: ${PORT_GATEWAY}
-
   cloud:
     gateway:
       discovery:
         locator:
           enabled: ${GATEWAY_ENABLED}
           lower-case-service-id: ${GATEWAY_LOWERCASE}
-
     consul:
-      host: consul
-      port: ${PORT_GATEWAY}
+      host: ${CONSUL_HOST}
+      port: ${CONSUL_PORT}
       discovery:
         enabled: ${CONSUL_ENABLED}
         service-name: ${spring.application.name}
@@ -23,7 +18,8 @@ server:
         prefer-ip-address: ${PREFER_IP_ADDRESS}
         register: false
 
-
+server:
+  port: ${PORT_GATEWAY}
 
 management:
   endpoints:
@@ -36,8 +32,8 @@ management:
 
 logging:
   level:
-    com.ecommerce.campus.auth-service: ${LOG_LEVEL_APP}
-    org.springframework.security: ${LOG_LEVEL_SECURITY}
-    org.hibernate.SQL: ${LOG_LEVEL_SQL}
+    com.ecommerce.campus.api-gateway: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
