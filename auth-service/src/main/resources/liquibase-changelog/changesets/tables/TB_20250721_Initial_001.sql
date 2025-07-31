@@ -35,3 +35,10 @@ CREATE TABLE auth_role (
     role_name VARCHAR(50) NOT NULL UNIQUE
 );
 
+CREATE TABLE user_role (
+    user_roleid BIGINT IDENTITY(1,1),
+    auth_userid BIGINT NOT NULL,
+    auth_roleid BIGINT NOT NULL,
+    CONSTRAINT pk_user_role PRIMARY KEY CLUSTERED (user_roleid),
+    
+);

@@ -33,13 +33,13 @@ public class User implements UserDetails {
     @Column(name= "auth_userid")
     private Long userId;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(name="auth_username", nullable = false, unique = true, length = 50)
     private String username;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(name="auth_password", nullable = false, unique = true)
     private String password;
 
     @Column(name = "first_name", length = 50)
@@ -51,7 +51,7 @@ public class User implements UserDetails {
     @Column(name = "maternal_surname", length = 50)
     private String maternalSurname;
 
-    @Column(nullable = false)
+    @Column(name ="is_active", nullable = false)
     @Builder.Default
     private Boolean isActive = true;
 
@@ -65,9 +65,9 @@ public class User implements UserDetails {
     // Eager fetch for performance - This tells JPA to load the roles immediately when the user is loaded
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+                name = "user_role",
+            joinColumns = @JoinColumn(name = "auth_userid"),
+            inverseJoinColumns = @JoinColumn(name = "auth_roleid")
     )
     @Builder.Default
     private Set<Role> roles = new HashSet<>();
