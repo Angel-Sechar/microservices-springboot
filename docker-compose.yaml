@@ -16,8 +16,8 @@ services:
     depends_on:
       - ${CONSUL_HOST}
     environment:
-      - CONSUL_HOST=${CONSUL_HOST}
-      - CONSUL_PORT=${CONSUL_PORT}
+      - SPRING_CLOUD_CONSUL_HOST=${CONSUL_HOST}
+      - SPRING_CLOUD_CONSUL_PORT=${CONSUL_PORT}
     networks:
       - campus-network
     restart: unless-stopped
