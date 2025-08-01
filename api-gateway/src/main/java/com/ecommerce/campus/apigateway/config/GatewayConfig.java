@@ -11,7 +11,7 @@ public class GatewayConfig {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                // Auth Service only microservice - for now
+                // Forwarding path
                 .route("auth-service", r -> r
                         .path("/api/auth/**")
                         .uri("lb://auth-service"))
