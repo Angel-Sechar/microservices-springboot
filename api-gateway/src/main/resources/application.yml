@@ -17,7 +17,19 @@ spring:
         locator:
           enabled: ${GATEWAY_ENABLED}
           lower-case-service-id: ${GATEWAY_LOWERCASE}
-
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          order: 1
+        - id: not-found-route
+          uri: forward:/not-found
+          predicates:
+            - Path=/api/**
+          filters:
+            - SetStatus=404
+          order: 999
 server:
   port: ${PORT_GATEWAY}
 
